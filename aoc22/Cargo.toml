@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+# To use my library in your own AoC solutions, replace these two dependencies with the ones commented below:
 aoclib = { path = "../aoclib" }
 aoclib-derive = { path = "../aoclib-derive" }
+# aoclib = { git = "https://github.com/avafloww/aoc.git" }
+# aoclib-derive = { git = "https://github.com/avafloww/aoc.git" }
+
+# Required to be able to use the `aoc` macro in your crate
 inventory = "0.3.2"
