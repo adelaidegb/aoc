@@ -1,0 +1,9 @@
+[package]
+name = "aoc22"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoclib = { path = "../aoclib" }
+aoclib-derive = { path = "../aoclib-derive" }
+inventory = "0.3.2"

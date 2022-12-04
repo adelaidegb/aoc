@@ -1,0 +1,15 @@
+[package]
+name = "aoclib-derive"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+aoclib = { path = "../aoclib" }
+regex = "1.7.0"
+once_cell = "1.16.0"
+syn = { version = "1.0.105", features = ["full"] }
+quote = "1.0.21"
+proc-macro2 = "1.0.47"

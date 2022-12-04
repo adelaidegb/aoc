@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "aoclib-derive",
+    "aoclib",
+    "aoc22",
+]
