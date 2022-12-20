@@ -1,60 +1,82 @@
-use std::ops::RangeInclusive;
+use regex::Regex;
 
-#[cfg(test)] mod test;
+#[derive(Clone, Debug)]
+struct SectionAssignment {
+    min: i32,
+    max: i32,
+}
+
+impl SectionAssignment {
+    fn contains(&self, n: i32) -> bool {
+        n >= self.min && n <= self.max
+    }
+
+    fn fully_contains(&self, other: &SectionAssignment) -> bool {
+        self.contains(other.min) && self.contains(other.max)
+    }
+}
+
+#[derive(Debug)]
+struct AssignedPair(SectionAssignment, SectionAssignment);
+
+impl AssignedPair {
+    fn has_full_overlap(&self) -> bool {
+        match self {
+            AssignedPair(assign1, assign2) => assign1.fully_contains(assign2) || assign2.fully_contains(assign1)
+        }
+    }
+
+    fn has_partial_overlap(&self) -> bool {
+        match self {
+            AssignedPair(assign1, assign2) => assign1.contains(assign2.min) || assign1.contains(assign2.max) || assign2.contains(assign1.min) || assign2.contains(assign1.max)
+        }
+    }
+}
+
+fn parse_sections(input: &String) -> (Vec<SectionAssignment>, Vec<AssignedPair>) {
+    let regex = Regex::new(r"^(\d+)-(\d+),(\d+)-(\d+)$").unwrap();
+    let mut assigns: Vec<SectionAssignment> = vec![];
+    let mut pairs: Vec<AssignedPair> = vec![];
+
+    for line in input.lines() {
+        let cap = regex.captures(line).unwrap();
+        let elf1 = SectionAssignment {
+            min: cap[1].parse().unwrap(),
+            max: cap[2].parse().unwrap()
+        };
+        let elf2 = SectionAssignment {
+            min: cap[3].parse().unwrap(),
+            max: cap[4].parse().unwrap()
+        };
+
+        pairs.push(AssignedPair(elf1.clone(), elf2.clone()));
+        assigns.push(elf1);
+        assigns.push(elf2);
+    }
+
+    (assigns, pairs)
+}
+
+fn find_overlaps(input: &String, pred: &dyn Fn(&AssignedPair) -> bool) -> String {
+    let (_assigns, pairs) = parse_sections(input);
+    let mut overlaps = 0u32;
+
+    for pair in pairs {
+        if pred(&pair) {
+            println!("{:?} has overlap", pair);
+            overlaps += 1;
+        }
+    }
+
+    overlaps.to_string()
+}
 
 #[aoc(day4, part1)]
-pub fn find_entirely_overlapping(input: String) -> String {
-    let lines = input.lines();
-    let pairs = lines.map(|line| {
-        let (first, second) = parse_pairs(line);
-
-        if entirely_overlaps(&first, &second) || entirely_overlaps(&second, &first) {
-            1
-        } else {
-            0
-        }
-    }).sum::<usize>();
-
-    pairs.to_string()
+fn part1(input: String) -> String {
+    find_overlaps(&input, &AssignedPair::has_full_overlap)
 }
 
 #[aoc(day4, part2)]
-pub fn find_partially_overlapping(input: String) -> String {
-    let lines = input.lines();
-    let pairs = lines.map(|line| {
-        let (first, second) = parse_pairs(line);
-
-        if partially_overlaps(&first, &second) || partially_overlaps(&second, &first) {
-            1
-        } else {
-            0
-        }
-    }).sum::<usize>();
-
-    pairs.to_string()
+fn part2(input: String) -> String {
+    find_overlaps(&input, &AssignedPair::has_partial_overlap)
 }
-
-fn entirely_overlaps(range1: &SectionAssignment, range2: &SectionAssignment) -> bool {
-    range1.start() <= range2.start() && range1.end() >= range2.end()
-}
-
-fn partially_overlaps(range1: &SectionAssignment, range2: &SectionAssignment) -> bool {
-    range1.start() <= range2.end() && range1.end() >= range2.start()
-}
-
-fn parse_pairs(line: &str) -> (SectionAssignment, SectionAssignment) {
-    let mut pairs = line.split(",");
-    let first = parse_pair(pairs.next().unwrap());
-    let second = parse_pair(pairs.next().unwrap());
-    (first, second)
-}
-
-fn parse_pair(pair: &str) -> SectionAssignment {
-    let mut parts = pair.split("-");
-    let first = parts.next().unwrap().parse::<u8>().unwrap();
-    let last = parts.next().unwrap().parse::<u8>().unwrap();
-
-    SectionAssignment::from(RangeInclusive::new(first, last))
-}
-
-type SectionAssignment = RangeInclusive<u8>;
