@@ -5,14 +5,14 @@ use regex::Regex;
 use syn::*;
 
 fn get_day(input: &str) -> Option<u32> {
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^day(\d{1,2})").unwrap());
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^day\s*(?:=|=>)?\s*(\d{1,2})").unwrap());
     RE.captures(input).and_then(|c| {
         Some(c.get(1)?.as_str().parse().ok()?)
     })
 }
 
 fn get_day_and_part(input: &str) -> Option<(u32, u32)> {
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^day(\d{1,2}), ?part([12])$").unwrap());
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^day\s*(?:=|=>)?\s*(\d{1,2}),\s*part\s*(?:=|=>)?\s*([12])$").unwrap());
     RE.captures(input).and_then(|c| {
         let day = c.get(1)?.as_str().parse().ok()?;
         let part = c.get(2)?.as_str().parse().ok()?;
