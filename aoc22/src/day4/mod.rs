@@ -1,4 +1,5 @@
 use regex::Regex;
+use lazy_static::lazy_static;
 
 #[derive(Clone, Debug)]
 struct SectionAssignment {
@@ -34,12 +35,15 @@ impl AssignedPair {
 }
 
 fn parse_sections(input: &String) -> (Vec<SectionAssignment>, Vec<AssignedPair>) {
-    let regex = Regex::new(r"^(\d+)-(\d+),(\d+)-(\d+)$").unwrap();
+    lazy_static! {
+        static ref LINE_REGEX: Regex = Regex::new(r"^(\d+)-(\d+),(\d+)-(\d+)$").unwrap();
+    }
+
     let mut assigns: Vec<SectionAssignment> = vec![];
     let mut pairs: Vec<AssignedPair> = vec![];
 
     for line in input.lines() {
-        let cap = regex.captures(line).unwrap();
+        let cap = LINE_REGEX.captures(line).unwrap();
         let elf1 = SectionAssignment {
             min: cap[1].parse().unwrap(),
             max: cap[2].parse().unwrap()
