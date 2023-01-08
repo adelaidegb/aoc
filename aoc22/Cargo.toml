@@ -7,6 +7,7 @@ edition = "2021"
 regex = "1.7.0"
 lazy_static = "1.4.0"
 bitvec = "1.0.1"
+itertools = "0.10.5"
 
 # To use my library in your own AoC solutions, replace these two dependencies with the ones commented below:
 aoclib = { path = "../aoclib" }
